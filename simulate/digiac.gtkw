@@ -1,0 +1,26 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Mon Feb 12 17:28:00 2024
+[*]
+[dumpfile] "/disk1/home/dmb/atom/Digiac-Mac-III-FPGA/simulate/dump.vcd"
+[dumpfile_mtime] "Mon Feb 12 17:27:30 2024"
+[dumpfile_size] 27752785
+[savefile] "/disk1/home/dmb/atom/Digiac-Mac-III-FPGA/simulate/digiac.gtkw"
+[timestart] 1185000
+[size] 1000 600
+[pos] -1 -1
+*-20.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 223
+[signals_width] 118
+[sst_expanded] 1
+[sst_vpaned_height] 152
+@28
+digiac_tb.clk50
+@22
+digiac_tb.leds[7:0]
+digiac_tb.trace[10:0]
+@28
+digiac_tb.trace_phi2
+digiac_tb.uart_tx
+[pattern_trace] 1
+[pattern_trace] 0
