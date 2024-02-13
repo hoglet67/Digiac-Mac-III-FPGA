@@ -131,8 +131,9 @@ module digiac
 
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = 7'b0000000;
+   wire [6:0]  uart_ip = {4'b0000, cpu_clken, 2'b00};
    wire [7:0]  uart_op;
+   wire        uart_intr_n;
 
    d2681 uart
      (
@@ -150,7 +151,7 @@ module digiac
       .rxa(uart_rx),
       .txb(),
       .rxb(1'b1),
-      .irq(uart_irq)
+      .intr_n(uart_intr_n)
       );
 
    assign led = uart_op;
@@ -203,6 +204,9 @@ m6522 VIA (
                uart_sel ? uart_DO :
                via_sel ? via_DO :
                8'hFF;
+
+   wire        cpu_IRQ = !via_irq_n;
+   wire        cpu_NMI = !uart_intr_n;
 
    // Arlet's 65C02 Core
    cpu_65c02 cpu

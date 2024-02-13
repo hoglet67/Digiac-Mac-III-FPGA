@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 iverilog ../src/*.v
 ./a.out
