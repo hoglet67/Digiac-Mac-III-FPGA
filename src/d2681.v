@@ -1,21 +1,22 @@
 module d2681
   (
-   input            clk,
-   input            reset,
-   input            clken,
-   input            enable,
-   input            we,
-   input [3:0]      addr,
-   input [7:0]      di,
-   output [7:0]     do,
-   input [6:0]      ip,
-   output reg [7:0] op = 8'h00,
-   output           txa,
-   input            rxa,
-   output           txb,
-   input            rxb,
-   output           intr_n
+   input        clk,
+   input        reset,
+   input        clken,
+   input        enable,
+   input        we,
+   input [3:0]  addr,
+   input [7:0]  di,
+   output [7:0] do,
+   input [6:0]  ip_n,
+   output [7:0] op_n,
+   output       txa,
+   input        rxa,
+   output       txb,
+   input        rxb,
+   output       intr_n
    );
+
 
    wire [7:0]       rxa_data;
    reg [7:0]        rxa_buffer = 8'h00;
@@ -27,9 +28,14 @@ module d2681
    wire             txa_active;
    wire             txa_rdy;
    wire             txa_emt;
+   reg [7:0]        op = 8'h00;
    reg [7:0]        imr = 8'h00;
    reg [15:0]       counter_preset = 8'h00;
    reg [15:0]       counter_value = 8'h00;
+
+   // Note: IP/OP ports are inverted
+   wire [6:0]       ip = ~ip_n;
+   assign           op_n = ~op;
 
    uart_rx #(.CLKS_PER_BIT(434)) uart_rxa
      (

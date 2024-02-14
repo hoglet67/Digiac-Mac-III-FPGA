@@ -131,7 +131,7 @@ module digiac
 
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = {4'b0000, cpu_clken, 2'b00};
+   wire [6:0]  uart_ip = {4'b1111, cpu_clken, 2'b11};
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
@@ -145,8 +145,8 @@ module digiac
       .addr(cpu_AB[3:0]),
       .di(cpu_DO),
       .do(uart_DO),
-      .ip(uart_ip),
-      .op(uart_op),
+      .ip_n(uart_ip),
+      .op_n(uart_op),
       .txa(uart_tx),
       .rxa(uart_rx),
       .txb(),
