@@ -74,7 +74,7 @@ module digiac
    always @(posedge cpu_clk)
      begin
         if (!pwr_up_reset_n)
-          pwr_up_reset_counter <= pwr_up_reset_counter + 1;
+          pwr_up_reset_counter <= pwr_up_reset_counter + 1'b1;
         hard_reset_n <= !sw1 & pwr_up_reset_n;
      end
 
@@ -233,7 +233,7 @@ m6522 VIA (
          clken_counter <= 0;
          cpu_clken <= 1'b1;
       end else begin
-         clken_counter <= clken_counter + 1;
+         clken_counter <= clken_counter + 1'b1;
          cpu_clken <= 1'b0;
       end
       cpu_clken1 <= cpu_clken;

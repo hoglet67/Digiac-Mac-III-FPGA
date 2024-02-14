@@ -25,7 +25,6 @@ module d2681
    wire [7:0]       txa_data;
    wire             txa_strb;
    wire             txa_active;
-   wire             txa_done;
    wire             txa_rdy;
    wire             txa_emt;
    reg [7:0]        imr = 8'h00;
@@ -57,7 +56,7 @@ module d2681
       .i_Tx_Byte(txa_data),
       .o_Tx_Active(txa_active),
       .o_Tx_Serial(txa),
-      .o_Tx_Done(txa_done)
+      .o_Tx_Done()
       );
 
    assign txa_data = di;
@@ -96,7 +95,7 @@ module d2681
          // This should be 0001, but the tracing NMI was happing a couple of cycles early
          if (counter_value == 16'hffff)
            counter_ready_int <= 1'b1;
-         counter_value <= counter_value - 1;
+         counter_value <= counter_value - 1'b1;
       end
       if (clken) begin
          if (enable & !we) begin

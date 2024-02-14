@@ -65,7 +65,7 @@ module uart_tx
                // Wait CLKS_PER_BIT-1 clock cycles for start bit to finish
                if (r_Clock_Count < CLKS_PER_BIT-1)
                  begin
-                    r_Clock_Count <= r_Clock_Count + 1;
+                    r_Clock_Count <= r_Clock_Count + 1'b1;
                     r_SM_Main     <= s_TX_START_BIT;
                  end
                else
@@ -83,7 +83,7 @@ module uart_tx
 
                if (r_Clock_Count < CLKS_PER_BIT-1)
                  begin
-                    r_Clock_Count <= r_Clock_Count + 1;
+                    r_Clock_Count <= r_Clock_Count + 1'b1;
                     r_SM_Main     <= s_TX_DATA_BITS;
                  end
                else
@@ -93,7 +93,7 @@ module uart_tx
                     // Check if we have sent out all bits
                     if (r_Bit_Index < 7)
                       begin
-                         r_Bit_Index <= r_Bit_Index + 1;
+                         r_Bit_Index <= r_Bit_Index + 1'b1;
                          r_SM_Main   <= s_TX_DATA_BITS;
                       end
                     else
@@ -113,7 +113,7 @@ module uart_tx
                // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
                if (r_Clock_Count < CLKS_PER_BIT-1)
                  begin
-                    r_Clock_Count <= r_Clock_Count + 1;
+                    r_Clock_Count <= r_Clock_Count + 1'b1;
                     r_SM_Main     <= s_TX_STOP_BIT;
                  end
                else
