@@ -19,10 +19,12 @@ module digiac
   (
    input         clk50,
    input         sw1,
-   input         sw2, // unused
+// input         sw2, // unused
    output [7:0]  led,
-   input         uart_rx,
-   output        uart_tx,
+   input         uart_rxa,
+   output        uart_txa,
+   input         uart_rxb,
+   output        uart_txb,
    input         ps2_clk,
    input         ps2_data,
    input         cas_in,
@@ -226,7 +228,7 @@ module digiac
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
-   d2681  #(.CLKS_PER_BIT(139)) uart
+   d2681  #(.CLKS_PER_BIT(139)) d2681
      (
       .clk(cpu_clk),
       .reset(cpu_reset),
@@ -238,10 +240,10 @@ module digiac
       .do(uart_DO),
       .ip_n(uart_ip),
       .op_n(uart_op),
-      .txa(uart_tx),
-      .rxa(uart_rx),
-      .txb(),
-      .rxb(1'b1),
+      .txa(uart_txa),
+      .rxa(uart_rxa),
+      .txb(uart_txb),
+      .rxb(uart_rxb),
       .intr_n(uart_intr_n)
       );
 

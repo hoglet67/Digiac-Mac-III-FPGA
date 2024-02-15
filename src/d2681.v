@@ -18,17 +18,8 @@ module d2681
    output       intr_n
    );
 
-
-   wire [7:0]       rxa_data;
-   reg [7:0]        rxa_buffer = 8'h00;
-   reg              rxa_rdy = 1'b1;
-   reg              rxa_ful = 1'b0;
-   wire             rxa_strb;
-   wire [7:0]       txa_data;
-   wire             txa_strb;
-   wire             txa_active;
-   wire             txa_rdy;
-   wire             txa_emt;
+   wire [7:0]       doa;
+   wire [7:0]       dob;
    reg [7:0]        op = 8'h00;
    reg [7:0]        imr = 8'h00;
    reg [15:0]       counter_preset = 8'h00;
@@ -38,38 +29,33 @@ module d2681
    wire [6:0]       ip = ~ip_n;
    assign           op_n = ~op;
 
-   uart_rx #(.CLKS_PER_BIT(CLKS_PER_BIT)) uart_rxa
+   uart #(.CLKS_PER_BIT(CLKS_PER_BIT)) uarta
      (
-      .i_Clock(clk),
-      .i_Rx_Serial(rxa),
-      .o_Rx_DV(rxa_strb),
-      .o_Rx_Byte(rxa_data)
-    );
-
-   always @(posedge clk)
-      if (rxa_strb) begin
-         rxa_buffer <= rxa_data;
-         rxa_rdy <= 1'b1;
-         rxa_ful <= 1'b1;
-      end else if (clken & enable & !we & addr == 4'h3) begin
-         rxa_rdy <= 1'b0;
-         rxa_ful <= 1'b0;
-      end
-
-   uart_tx #(.CLKS_PER_BIT(CLKS_PER_BIT)) uart_txa
-     (
-      .i_Clock(clk),
-      .i_Tx_DV(txa_strb),
-      .i_Tx_Byte(txa_data),
-      .o_Tx_Active(txa_active),
-      .o_Tx_Serial(txa),
-      .o_Tx_Done()
+      .clk(clk),
+      .clken(clken),
+      .reset(reset),
+      .we(we),
+      .enable(enable & addr[3:2] == 2'b00),
+      .addr(addr[1:0]),
+      .di(di),
+      .do(doa),
+      .tx(txa),
+      .rx(rxa)
       );
 
-   assign txa_data = di;
-   assign txa_strb = clken & we & enable & addr == 4'h3;
-   assign txa_rdy  = !txa_active;
-   assign txa_emt  = !txa_active;
+   uart #(.CLKS_PER_BIT(CLKS_PER_BIT)) uartb
+     (
+      .clk(clk),
+      .clken(clken),
+      .reset(reset),
+      .we(we),
+      .enable(enable & addr[3:2] == 2'b10),
+      .addr(addr[1:0]),
+      .di(di),
+      .do(dob),
+      .tx(txb),
+      .rx(rxb)
+      );
 
    always @(posedge clk) begin
       if (clken) begin
@@ -121,12 +107,12 @@ module d2681
 
    assign intr_n = !(|(imr & isr));
 
-   assign do = (addr == 4'b1) ? { 4'b0000, txa_emt, txa_rdy, rxa_ful, rxa_rdy} :
-               (addr == 4'h3) ? rxa_buffer :
-               (addr == 4'h5) ? isr :
-               (addr == 4'h6) ? counter_value[15:8] :
-               (addr == 4'h7) ? counter_value[7:0] :
-               (addr == 4'hd) ? ip :
+   assign do = (addr == 4'h1) || (addr == 4'h3) ? doa                 :
+               (addr == 4'h5)                   ? isr                 :
+               (addr == 4'h6)                   ? counter_value[15:8] :
+               (addr == 4'h7)                   ? counter_value[ 7:0] :
+               (addr == 4'h9) || (addr == 4'hb) ? dob                 :
+               (addr == 4'hd)                   ? ip                  :
                8'hFF;
 
 endmodule
