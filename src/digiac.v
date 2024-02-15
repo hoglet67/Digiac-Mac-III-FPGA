@@ -164,7 +164,7 @@ module digiac
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
-   d2681 uart
+   d2681 #(.CLKS_PER_BIT(434)) uart
      (
       .clk(cpu_clk),
       .reset(cpu_reset),
