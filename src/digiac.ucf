@@ -17,6 +17,28 @@ NET "led<5>"     LOC = "P119" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 
 NET "led<6>"     LOC = "P118" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "led<7>"     LOC = "P117" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 
+# VIA
+NET "via_pa<0>"  LOC = "P84"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<1>"  LOC = "P87"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<2>"  LOC = "P92"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<3>"  LOC = "P94"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<4>"  LOC = "P97"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<5>"  LOC = "P99"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<6>"  LOC = "P101" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pa<7>"  LOC = "P104" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_ca1"    LOC = "P111" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_ca2"    LOC = "P114" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<0>"  LOC = "P85"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<1>"  LOC = "P88"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<2>"  LOC = "P93"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<3>"  LOC = "P95"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<4>"  LOC = "P98"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<5>"  LOC = "P100" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<6>"  LOC = "P102" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_pb<7>"  LOC = "P105" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_cb1"    LOC = "P112" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "via_cb2"    LOC = "P115" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+
 # Switches
 NET "sw1"        LOC = "P132" | IOSTANDARD = LVCMOS33                           ;
 NET "sw2"        LOC = "P131" | IOSTANDARD = LVCMOS33                           ;

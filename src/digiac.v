@@ -19,7 +19,7 @@ module digiac
   (
    input         clk50,
    input         sw1,
-   input         sw2,
+   input         sw2, // unused
    output [7:0]  led,
    input         uart_rx,
    output        uart_tx,
@@ -27,6 +27,12 @@ module digiac
    input         ps2_data,
    input         cas_in,
    output        cas_out,
+   inout [7:0]   via_pa,
+   input         via_ca1,
+   inout         via_ca2,
+   inout [7:0]   via_pb,
+   inout         via_cb1,
+   inout         via_cb2,
    output [10:0] trace,
    output        tm1638_clk,
    output        tm1638_stb,
@@ -241,8 +247,6 @@ module digiac
 
    assign cas_out = uart_op[7];
 
-   assign led = ~uart_op;
-
    // ===============================================================
    // VIA
    // ===============================================================
@@ -250,37 +254,59 @@ module digiac
    wire [7:0]  via_DO;
    wire        via_sel   = (cpu_AB[15:12] == 4'b1001);
 
-m6522 VIA (
-     //  System VIA is reset by power on reset only
-    .ENA_4(via_clken), // TODO
-    .CLK(cpu_clk),
-    .I_RS(cpu_AB[3:0]),
-    .I_DATA(cpu_DO),
-    .O_DATA(via_DO),
-    .O_DATA_OE_L(),
-    .I_RW_L(!cpu_WE),
-    .I_CS1(via_sel),
-    .I_CS2_L(1'b0), // nCS2(1'b 0),
-    .O_IRQ_L(via_irq_n),
-    .I_P2_H(cpu_clken),
-    .RESET_L(hard_reset_n),
-    .I_CA1(via_ca1_in),
-    .I_CA2(via_ca2_in),
-    .O_CA2(via_ca2_out),
-    .O_CA2_OE_L(via_ca2_oe_n),
-    .I_PA(via_pa_in),
-    .O_PA(via_pa_out),
-    .O_PA_OE_L(via_pa_oe_n),
-    .I_CB1(via_cb1_in),
-    .O_CB1(via_cb1_out),
-    .O_CB1_OE_L(via_cb1_oe_n),
-    .I_CB2(via_cb2_in),
-    .O_CB2(via_cb2_out),
-    .O_CB2_OE_L(via_cb2_oe_n),
-    .I_PB(via_pb_in),
-    .O_PB(via_pb_out),
-    .O_PB_OE_L(via_pb_oe_n)
-);
+   m6522 VIA
+     (
+      .ENA_4      (via_clken),
+      .CLK        (cpu_clk),
+      .I_RS       (cpu_AB[3:0]),
+      .I_DATA     (cpu_DO),
+      .O_DATA     (via_DO),
+      .O_DATA_OE_L(),
+      .I_RW_L     (!cpu_WE),
+      .I_CS1      (via_sel),
+      .I_CS2_L    (1'b0),
+      .O_IRQ_L    (via_irq_n),
+      .I_P2_H     (cpu_clken),
+      .RESET_L    (hard_reset_n),
+      .I_CA1      (via_ca1_in),
+      .I_CA2      (via_ca2_in),
+      .O_CA2      (via_ca2_out),
+      .O_CA2_OE_L (via_ca2_oe_n),
+      .I_PA       (via_pa_in),
+      .O_PA       (via_pa_out),
+      .O_PA_OE_L  (via_pa_oe_n),
+      .I_CB1      (via_cb1_in),
+      .O_CB1      (via_cb1_out),
+      .O_CB1_OE_L (via_cb1_oe_n),
+      .I_CB2      (via_cb2_in),
+      .O_CB2      (via_cb2_out),
+      .O_CB2_OE_L (via_cb2_oe_n),
+      .I_PB       (via_pb_in),
+      .O_PB       (via_pb_out),
+      .O_PB_OE_L  (via_pb_oe_n)
+      );
+
+   genvar      i;
+   generate
+      for (i = 0; i < 8; i = i + 1) begin
+         assign via_pa[i] = via_pa_oe_n[i] ? 1'bZ : via_pa_out[i];
+         assign via_pb[i] = via_pb_oe_n[i] ? 1'bZ : via_pb_out[i];
+      end
+   endgenerate
+
+   assign via_pa_in = via_pa;
+   assign via_pb_in = via_pb;
+
+   assign via_ca1_in = via_ca1;
+   assign via_ca2_in = via_ca2;
+   assign via_cb1_in = via_cb1;
+   assign via_cb2_in = via_cb2;
+
+   assign via_ca2 = via_ca2_oe_n ? 1'bZ : via_ca2_out;
+   assign via_cb1 = via_cb1_oe_n ? 1'bZ : via_cb1_out;
+   assign via_cb2 = via_cb2_oe_n ? 1'bZ : via_cb2_out;
+
+   assign led = via_pb;
 
    // ===============================================================
    // CPU
