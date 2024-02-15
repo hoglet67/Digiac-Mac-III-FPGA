@@ -1,44 +1,48 @@
 # Clock
-NET "clk50"    LOC = "P50"  | IOSTANDARD = LVCMOS33 ;
-NET "clk50"    TNM_NET = clk_period_grp_50;
+NET "clk50"      LOC = "P50"  | IOSTANDARD = LVCMOS33 ;
+NET "clk50"      TNM_NET = clk_period_grp_50;
 TIMESPEC TS_clk_period_50 = PERIOD "clk_period_grp_50" 20.00ns HIGH;
 
 # UART
-NET "uart_tx"  LOC = "P51"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "uart_rx"  LOC = "P55"  | IOSTANDARD = LVCMOS33                           ;
+NET "uart_tx"    LOC = "P51"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "uart_rx"    LOC = "P55"  | IOSTANDARD = LVCMOS33                           ;
 
 # LEDs
-NET "led<0>"   LOC = "P138" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<1>"   LOC = "P137" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<2>"   LOC = "P134" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<3>"   LOC = "P133" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<4>"   LOC = "P120" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<5>"   LOC = "P119" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<6>"   LOC = "P118" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "led<7>"   LOC = "P117" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<0>"     LOC = "P138" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<1>"     LOC = "P137" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<2>"     LOC = "P134" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<3>"     LOC = "P133" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<4>"     LOC = "P120" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<5>"     LOC = "P119" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<6>"     LOC = "P118" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "led<7>"     LOC = "P117" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 
 # Switches
-NET "sw1"      LOC = "P132" | IOSTANDARD = LVCMOS33                           ;
-NET "sw2"      LOC = "P131" | IOSTANDARD = LVCMOS33                           ;
+NET "sw1"        LOC = "P132" | IOSTANDARD = LVCMOS33                           ;
+NET "sw2"        LOC = "P131" | IOSTANDARD = LVCMOS33                           ;
 
 # PS/2 Keyboard, used to emulate 24-key keypad
-NET "ps2_clk"   LOC = "P6"  | IOSTANDARD = LVCMOS33 | PULLUP                  ;
-NET "ps2_data"  LOC = "P7"  | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+NET "ps2_clk"    LOC = "P6"   | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+NET "ps2_data"   LOC = "P7"   | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+
+# Cassette
+NET "cas_in"     LOC = "P139" | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+NET "cas_out"    LOC = "P140" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 
 # TM1638 8x 7SEG displau
-NET "tm1638_dio" LOC = "P80" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "tm1638_clk" LOC = "P82" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "tm1638_stb" LOC = "P83" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "tm1638_dio" LOC = "P80"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "tm1638_clk" LOC = "P82"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "tm1638_stb" LOC = "P83"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 
 # tracing
-NET "trace<0>"  LOC = "P8"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<1>"  LOC = "P10" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<2>"  LOC = "P12" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<3>"  LOC = "P15" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<4>"  LOC = "P17" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<5>"  LOC = "P22" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<6>"  LOC = "P24" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<7>"  LOC = "P27" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<8>"  LOC = "P30" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<9>"  LOC = "P33" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
-NET "trace<10>" LOC = "P35" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<0>"   LOC = "P8"   | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<1>"   LOC = "P10"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<2>"   LOC = "P12"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<3>"   LOC = "P15"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<4>"   LOC = "P17"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<5>"   LOC = "P22"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<6>"   LOC = "P24"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<7>"   LOC = "P27"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<8>"   LOC = "P30"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<9>"   LOC = "P33"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "trace<10>"  LOC = "P35"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;

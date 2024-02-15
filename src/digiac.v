@@ -25,6 +25,8 @@ module digiac
    output        uart_tx,
    input         ps2_clk,
    input         ps2_data,
+   input         cas_in,
+   output        cas_out,
    output [10:0] trace,
    output        tm1638_clk,
    output        tm1638_stb,
@@ -194,9 +196,27 @@ module digiac
    // UART
    // ===============================================================
 
+   // IP0 - Serial A CTS
+   // IP1 - Serial B CTS
+   // IP2 - Counter external clock input (1MHz CPU clock for single step)
+   // IP3 - Keyboard[0]
+   // IP4 - Keyboard[1]
+   // IP5 - Keyboard[2]
+   // IP6 - Casette In
+   //
+   // OP0 - Serial A RTS
+   // OP1 - Serial B RTS
+   // OP2 - Unused by Monitor
+   // OP3 - Unused by Monitor
+   // OP4 - 7-segment LED nWr input
+   // OP5 - 7-segment LED Mode input
+   // OP6 - LED
+   // OP7 - Cassette Out
+
+
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = {1'b1, key, cpu_clken, 2'b11};
+   wire [6:0]  uart_ip = {cas_in, key, cpu_clken, 2'b11};
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
@@ -219,7 +239,9 @@ module digiac
       .intr_n(uart_intr_n)
       );
 
-   assign led = {7'b0, ~uart_op[6]};
+   assign cas_out = uart_op[7];
+
+   assign led = ~uart_op;
 
    // ===============================================================
    // VIA
