@@ -17,6 +17,8 @@ module digiac_tb();
       .sw1(1'b0),
       .sw2(1'b0),
       .led(leds),
+      .ps2_clk(1'b1),
+      .ps2_data(1'b1),
       .uart_rx(1'b1),
       .uart_tx(uart_tx),
       .trace(trace)

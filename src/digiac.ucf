@@ -21,6 +21,10 @@ NET "led<7>"   LOC = "P117" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "sw1"      LOC = "P132" | IOSTANDARD = LVCMOS33                           ;
 NET "sw2"      LOC = "P131" | IOSTANDARD = LVCMOS33                           ;
 
+# PS/2 Keyboard, used to emulate 24-key keypad
+NET "ps2_clk"   LOC = "P6"  | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+NET "ps2_data"  LOC = "P7"  | IOSTANDARD = LVCMOS33 | PULLUP                  ;
+
 # TM1638 8x 7SEG displau
 NET "tm1638_dio" LOC = "P80" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "tm1638_clk" LOC = "P82" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;

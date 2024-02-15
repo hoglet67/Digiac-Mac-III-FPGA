@@ -23,6 +23,8 @@ module digiac
    output [7:0]  led,
    input         uart_rx,
    output        uart_tx,
+   input         ps2_clk,
+   input         ps2_data,
    output [10:0] trace,
    output        tm1638_clk,
    output        tm1638_stb,
@@ -121,6 +123,7 @@ module digiac
    // Latch
    // ===============================================================
 
+   wire [2:0]  key;
    reg [7:0]   latch;
    wire        latch_sel = (cpu_AB[15:12] == 4'b0111);
 
@@ -128,6 +131,15 @@ module digiac
      if (cpu_clken1 && latch_sel && cpu_WE)
        latch <= cpu_DO;
 
+   keypad keypad
+     (
+      .clk(cpu_clk),
+      .reset(cpu_reset),
+      .ps2_clk(ps2_clk),
+      .ps2_data(ps2_data),
+      .col(latch),
+      .row(key)
+      );
 
    icm7228 icm7228
      (
@@ -148,7 +160,7 @@ module digiac
 
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = {4'b1001, cpu_clken, 2'b11};
+   wire [6:0]  uart_ip = {1'b1, key, cpu_clken, 2'b11};
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 

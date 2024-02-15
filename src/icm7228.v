@@ -53,7 +53,7 @@ module icm7228
                dcount <= 3'b000;
                control <= data[7:4];
             end else begin
-               display[dcount] <= data;
+               display[dcount] <= data ^ 8'h80; // The DP (bit 7) is active low, so invert
                dcount <= dcount + 1'b1;
                if (dcount == 3'b111)
                  send <= 1'b1;
