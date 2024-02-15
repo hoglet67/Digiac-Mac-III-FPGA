@@ -31,7 +31,8 @@ module digiac
    inout         tm1638_dio
  );
 
-   wire        cpu_clk = clk50;
+   wire        cpu_clk;
+   wire        clk0;
    wire [15:0] cpu_AB_next;
    reg [15:0]  cpu_AB;
    wire [7:0]  cpu_DO_next;
@@ -63,10 +64,45 @@ module digiac
    wire [7:0]  via_pb_oe_n;
 
 
-   reg [5:0]   clken_counter = 6'b0;
+   reg [3:0]   clken_counter = 4'b0;
    reg         cpu_clken = 1'b0;
    reg         cpu_clken1 = 1'b0;
    reg         via_clken = 1'b0;
+
+   // ===============================================================
+   // Clock PLL: 50MHz -> 16MHz
+   // ===============================================================
+
+   // PLL to generate CPU clock of 50 * DCM_MULT / DCM_DIV MHz
+   DCM
+     #(
+       .CLKFX_MULTIPLY   (8),
+       .CLKFX_DIVIDE     (25),
+       .CLKIN_PERIOD     (20.000),
+       .CLK_FEEDBACK     ("1X")
+       )
+   DCM1
+     (
+      .CLKIN            (clk50),
+      .CLKFB            (clk0),
+      .RST              (1'b0),
+      .DSSEN            (1'b0),
+      .PSINCDEC         (1'b0),
+      .PSEN             (1'b0),
+      .PSCLK            (1'b0),
+      .CLKFX            (cpu_clk),
+      .CLKFX180         (),
+      .CLKDV            (),
+      .CLK2X            (),
+      .CLK2X180         (),
+      .CLK0             (clk0),
+      .CLK90            (),
+      .CLK180           (),
+      .CLK270           (),
+      .LOCKED           (),
+      .PSDONE           (),
+      .STATUS           ()
+      );
 
    // ===============================================================
    // Reset generation
@@ -164,7 +200,7 @@ module digiac
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
-   d2681 #(.CLKS_PER_BIT(434)) uart
+   d2681  #(.CLKS_PER_BIT(139)) uart
      (
       .clk(cpu_clk),
       .reset(cpu_reset),
@@ -258,18 +294,16 @@ m6522 VIA (
    reg [7:0]   trace_data;
 
    always @(posedge cpu_clk) begin
-      if (clken_counter == 49) begin
-         clken_counter <= 0;
-         cpu_clken <= 1'b1;
-      end else begin
-         clken_counter <= clken_counter + 1'b1;
-         cpu_clken <= 1'b0;
-      end
-      cpu_clken1 <= cpu_clken;
-      if (clken_counter == 8 || clken_counter == 16 || clken_counter == 24 || clken_counter == 32)
+      if (clken_counter == 4'b1111)
+        cpu_clken <= 1'b1;
+      else
+        cpu_clken <= 1'b0;
+      if (clken_counter[1:0] == 2'b11)
         via_clken <= 1'b1;
       else
         via_clken <= 1'b0;
+      clken_counter <= clken_counter + 1'b1;
+      cpu_clken1 <= cpu_clken;
       if (cpu_clken) begin
          cpu_AB <= cpu_AB_next;
          cpu_WE <= cpu_WE_next;
@@ -285,7 +319,7 @@ m6522 VIA (
             trace_rnw <= 1'b1;
             trace_data <= cpu_DI;
          end
-      end else if (clken_counter == 24) begin
+      end else if (clken_counter == 8) begin
          trace_phi2 <= 1'b0;
       end
    end
