@@ -18,8 +18,8 @@
 module digiac
   (
    input         clk50,
-   input         sw1,
-// input         sw2, // unused
+   input         sw1, // press to reset
+   input         sw2, // press to simulate no serial port connected
    output [7:0]  led,
    input         uart_rxa,
    output        uart_txa,
@@ -224,7 +224,7 @@ module digiac
 
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = {cas_in, key, cpu_clken, 2'b11};
+   wire [6:0]  uart_ip = {cas_in, key, cpu_clken, 1'b1, !sw2};
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
