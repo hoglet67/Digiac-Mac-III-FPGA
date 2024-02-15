@@ -1,6 +1,7 @@
 #*
 *~
-simulate/a.out
+a.out
 simulate/dump.vcd
 xilinx/iseconfig/
 xilinx/working/
+not_in_git/

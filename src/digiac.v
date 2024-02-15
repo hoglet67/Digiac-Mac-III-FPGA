@@ -23,7 +23,10 @@ module digiac
    output [7:0]  led,
    input         uart_rx,
    output        uart_tx,
-   output [10:0] trace
+   output [10:0] trace,
+   output        tm1638_clk,
+   output        tm1638_stb,
+   inout         tm1638_dio
  );
 
    wire        cpu_clk = clk50;
@@ -125,13 +128,27 @@ module digiac
      if (cpu_clken1 && latch_sel && cpu_WE)
        latch <= cpu_DO;
 
+
+   icm7228 icm7228
+     (
+      .clk(cpu_clk),
+      .clken(cpu_clken),
+      .reset(cpu_reset),
+      .wr(uart_op[4]),
+      .mode(uart_op[5]),
+      .data(latch),
+      .tm1638_clk(tm1638_clk),
+      .tm1638_stb(tm1638_stb),
+      .tm1638_dio(tm1638_dio)
+   );
+
    // ===============================================================
    // UART
    // ===============================================================
 
    wire [7:0]  uart_DO;
    wire        uart_sel  = (cpu_AB[15:12] == 4'b1000);
-   wire [6:0]  uart_ip = {4'b1111, cpu_clken, 2'b11};
+   wire [6:0]  uart_ip = {4'b1001, cpu_clken, 2'b11};
    wire [7:0]  uart_op;
    wire        uart_intr_n;
 
@@ -154,7 +171,7 @@ module digiac
       .intr_n(uart_intr_n)
       );
 
-   assign led = uart_op;
+   assign led = {7'b0, ~uart_op[6]};
 
    // ===============================================================
    // VIA

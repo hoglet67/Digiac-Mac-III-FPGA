@@ -21,8 +21,13 @@ NET "led<7>"   LOC = "P117" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "sw1"      LOC = "P132" | IOSTANDARD = LVCMOS33                           ;
 NET "sw2"      LOC = "P131" | IOSTANDARD = LVCMOS33                           ;
 
-# traceing
-NET "trace<0>"  LOC = "P8" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+# TM1638 8x 7SEG displau
+NET "tm1638_dio" LOC = "P80" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "tm1638_clk" LOC = "P82" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+NET "tm1638_stb" LOC = "P83" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+
+# tracing
+NET "trace<0>"  LOC = "P8"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "trace<1>"  LOC = "P10" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "trace<2>"  LOC = "P12" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "trace<3>"  LOC = "P15" | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
