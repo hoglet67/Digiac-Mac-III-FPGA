@@ -1,0 +1,17 @@
+ADDRESS_MAP avrmap PPC405 0
+
+    ADDRESS_SPACE rom_code RAMB16 [0x00000000:0x00003fff]
+        BUS_BLOCK
+            Mram_rom8 [7];
+            Mram_rom7 [6];
+            Mram_rom6 [5];
+            Mram_rom5 [4];
+            Mram_rom4 [3];
+            Mram_rom3 [2];
+            Mram_rom2 [1];
+            Mram_rom1 [0];
+        END_BUS_BLOCK;
+
+    END_ADDRESS_SPACE;
+
+END_ADDRESS_MAP;
