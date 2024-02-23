@@ -1512,6 +1512,11 @@ user_eprom_entry        = &a002
 .cc89a
     lda #4
     sta l0236
+;.resync
+;    lda l0234       ;; block until the next stop bit boundary
+;    and #&01        ;; (i.e. ensure an integer number of stop bits)
+;    bne resync      ;; note: this won't handle 300 baud
+
     ldx #9
     bne cc8a8
 .loop_cc8a3
@@ -1590,7 +1595,7 @@ user_eprom_entry        = &a002
 .cc920
     ldy #&0c
 .cc922
-    jsr sub_cc9ac
+    jsr sub_cc9ac ;; reads and writes l0235
     cpx #7
     bcc cc920
     cpx #&13
@@ -1603,46 +1608,60 @@ user_eprom_entry        = &a002
     ora #8
     sta l0266
     bne cc902
+
+
+;; 010101010101010101010101010101010101010101010101010
+;; 0110 1010 0110 1010 0110 0110 0110 0110 0110 101010 ;; 0x05
+;; 0110 1010 1010 1010 1010 1010 1010 1010 1010 101010 ;; 0xff
+;; 0110 1010 0110 1010 0110 0110 0110 0110 0110 101010 ;; 0x05
+;; 0110 0110 0110 0110 0110 0110 0110 0110 0110 101010 ;; 0x00
+
 .cc93f
-    jsr sub_cc9ac
-    cpx #&15
-    bcc cc93f
-    sta l0233
-    ldx l0006
-    lda l02c0,x
+    jsr sub_cc9ac    ; reads and writes l0235
+    cpx #&15         ; measure the time to the next edge (in 15us ticks)
+    bcc cc93f        ; compare to 21 (315us) loop back if less
+    sta l0233        ; save current polarity (in l0233)
+
+    ldx l0006        ; stream * 8 (for casette the stream is 4)
+    lda l02c0,x      ; suspect 0 = 1200 baud; 1 = 300 baud
     beq cc953
-    jsr sub_cc997
+    jsr sub_cc997    ; delay for 800us, then set VIA timer for 3328us and wait for it to expire
 .cc953
-    jsr cc9bd
-    ldx #0
-    ldy #&21 ; '!'
+    jsr cc9bd        ; reads l0233; writes l0235
+                     ; wait for next l0233 -> !l0233 edge
+                                 ; 19
+    ldx #0           ;           ;  2   count transitions over next ~600us
+    ldy #&21 ;       ;           ;  2    was &1E in "take1" ROM
 .loop_cc95a
-    lda uart_reg_d_input_ports
-    and #&40 ; '@'
-    cmp l0235
-    beq cc968
-    inx
-    sta l0235
+    lda uart_reg_d_input_ports   ; 4
+    and #&40 ; '@'               ; 2
+    cmp l0235                    ; 4
+    beq cc968                    ; 3   2
+    inx                          ;     2
+    sta l0235                    ;     4 === 7 cycles per edge
 .cc968
-    dey
-    bne loop_cc95a
-    cpx #2
-    ror l0232
-    ldx l0006
-    lda led8f,x
+    dey                          ; 2
+    bne loop_cc95a               ; 3 === 18 cycles per count 23 + (18 * &21) = 617
+
+
+    cpx #2           ; threshold: 0/1 means "zero" bit, 2 or more means a "one" bit
+    ror l0232        ; accumulate received bit
+
+    ldx l0006        ; stream * 8 (for casette the stream is 4)
+    lda led8f,x      ;
     beq cc97a
-    jsr sub_cc9a1
+    jsr sub_cc9a1    ; wait for VIA T1 to wrap, now in middle of next bit
 .cc97a
-    dec l0234
-    bne cc953
-    ldx l0006
-    lda l02c0,x
-    beq cc990
-    jsr cc9bd
+    dec l0234        ; decrement bit counter
+    bne cc953        ; branch if more bits
+    ldx l0006        ; stream * 8 (for casette the stream is 4)
+    lda l02c0,x      ; suspect 0 = 1200 baud; 1 = 300 baud
+    beq cc990        ; if 300 baud we need to wait for stop bit (high tone)
+    jsr cc9bd        ; wait for next p -> !p edge
 .loop_cc989
-    jsr sub_cc9ac
-    cpx #&12
-    bcs loop_cc989
+    jsr sub_cc9ac    ; measure the time to the next edge (in 15us ticks)
+    cpx #&12         ; compare to 18 (270us)
+    bcs loop_cc989   ; branch if greater or equal
 .cc990
     pla
     tax
@@ -1653,10 +1672,10 @@ user_eprom_entry        = &a002
 .sub_cc997
     ldy #&a0
 .loop_cc999
-    dey
+    dey                       ; 800us
     bne loop_cc999
     lda #&0d
-    sta via_reg_5
+    sta via_reg_5             ; 13 * 256 = 3328us
 .sub_cc9a1
     lda via_reg_4
 .loop_cc9a4
@@ -1668,13 +1687,13 @@ user_eprom_entry        = &a002
 .sub_cc9ac
     ldx #0
 .loop_cc9ae
-    inx
-    lda uart_reg_d_input_ports
-    and #&40 ; '@'
-    cmp l0235
-    beq loop_cc9ae
-    sta l0235
-    rts
+    inx                          ;; 2
+    lda uart_reg_d_input_ports   ;; 4
+    and #&40 ; '@'               ;; 2
+    cmp l0235                    ;; 4
+    beq loop_cc9ae               ;; 3
+    sta l0235                    ;; 4
+    rts                          ;; 6
 
 .cc9bd
     lda uart_reg_d_input_ports
@@ -5645,8 +5664,10 @@ lee6a = lee69+1
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+
+
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff
 
 .application_1
     sei
@@ -7473,144 +7494,5 @@ lfb99 = lfb98+1
 ;     sub_cfd21
 ;     sub_cfd33
 ;     sub_cfd3f
-    assert <(stack_underflow_handler-1) == &7b
-    assert <alt_nmi_handler == &08
-    assert <complex_irq_handler == &cd
-    assert <default_brk_handler == &f6
-    assert <simple_irq_handler == &62
-    assert <string_a_x_y_pc_sp_sr == &0d
-    assert <string_at_breakpoint == &74
-    assert <string_calling_keypad_display_monitor == &c7
-    assert <string_device == &69
-    assert <string_done == &f5
-    assert <string_error == &97
-    assert <string_help_commands_long == &de
-    assert <string_help_commands_short == &64
-    assert <string_help_system_addresses == &c9
-    assert <string_lj_systems_banner == &fb
-    assert <string_load_t1_t2_cas == &e9
-    assert <string_loaded == &5f
-    assert <string_loading == &52
-    assert <string_mac == &05
-    assert <string_memory_limit == &16
-    assert <string_press_return_for_system_address_info == &8f
-    assert <string_saved == &1e
-    assert <string_saving == &14
-    assert <string_serial_params == &19
-    assert <string_start_recording == &f1
-    assert <string_start_tape == &89
-    assert >(stack_underflow_handler-1) == &dd
-    assert >alt_nmi_handler == &e0
-    assert >application_1_menu == &fa
-    assert >application_2_menu == &fe
-    assert >complex_irq_handler == &c8
-    assert >default_brk_handler == &de
-    assert >simple_irq_handler == &f8
-    assert >string_a_x_y_pc_sp_sr == &ce
-    assert >string_at_breakpoint == &df
-    assert >string_calling_keypad_display_monitor == &d2
-    assert >string_device == &d0
-    assert >string_done == &c5
-    assert >string_error == &c6
-    assert >string_help_commands_long == &d4
-    assert >string_help_commands_short == &d3
-    assert >string_help_system_addresses == &d8
-    assert >string_lj_systems_banner == &ef
-    assert >string_load_t1_t2_cas == &e9
-    assert >string_loaded == &d0
-    assert >string_loading == &d0
-    assert >string_mac == &c3
-    assert >string_memory_limit == &cd
-    assert >string_press_return_for_system_address_info == &d8
-    assert >string_saved == &d2
-    assert >string_saving == &d2
-    assert >string_serial_params == &ee
-    assert >string_start_recording == &d1
-    assert >string_start_tape == &d0
-    assert ce73f == &e73f
-    assert ce826 == &e826
-    assert ce8ca == &e8ca
-    assert cf6e0 == &f6e0
-    assert cf72d == &f72d
-    assert cf881 == &f881
-    assert cfbbc == &fbbc
-    assert default_brk_handler == &def6
-    assert irq_brk_handler == &e0ca
-    assert loop_cc7bd == &c7bd
-    assert loop_cc7d9 == &c7d9
-    assert nmi_handler == &e0dc
-    assert reset_handler == &f022
-    assert rti_only == &f19d
-    assert string_error_0 == &effa
-    assert string_error_1 == &ee9f
-    assert string_error_10 == &ef20
-    assert string_error_11 == &ef41
-    assert string_error_12 == &ef56
-    assert string_error_13 == &effa
-    assert string_error_14 == &effa
-    assert string_error_15 == &effa
-    assert string_error_16 == &effa
-    assert string_error_17 == &effa
-    assert string_error_18 == &effa
-    assert string_error_19 == &effa
-    assert string_error_2 == &eeb1
-    assert string_error_20 == &ef6e
-    assert string_error_21 == &ef81
-    assert string_error_22 == &ef8e
-    assert string_error_23 == &ef9c
-    assert string_error_24 == &efad
-    assert string_error_25 == &efc7
-    assert string_error_26 == &efe3
-    assert string_error_3 == &eec0
-    assert string_error_4 == &eed8
-    assert string_error_5 == &eeed
-    assert string_error_6 == &ef03
-    assert string_error_7 == &effa
-    assert string_error_8 == &ef14
-    assert string_error_9 == &effa
-    assert sub_cc71d == &c71d
-    assert sub_cc775 == &c775
-    assert sub_cc7f5 == &c7f5
-    assert sub_cc803 == &c803
-    assert sub_cc811 == &c811
-    assert sub_cc820 == &c820
-    assert sub_cc84a == &c84a
-    assert sub_cc84e == &c84e
-    assert sub_cc850 == &c850
-    assert sub_cc900 == &c900
-    assert sub_cc9d5 == &c9d5
-    assert sub_cc9ea == &c9ea
-    assert sub_ccab8 == &cab8
-    assert sub_ccb6c == &cb6c
-    assert sub_cccd0 == &ccd0
-    assert sub_ccd3c == &cd3c
-    assert sub_ccd53 == &cd53
-    assert sub_cce5b == &ce5b
-    assert sub_ccefe == &cefe
-    assert sub_cd167 == &d167
-    assert sub_cd226 == &d226
-    assert sub_cd2af == &d2af
-    assert sub_cd2e9 == &d2e9
-    assert sub_cd2ff == &d2ff
-    assert sub_cdcba == &dcba
-    assert sub_cdd13 == &dd13
-    assert sub_cdda1 == &dda1
-    assert sub_cddfb == &ddfb
-    assert sub_cdf97 == &df97
-    assert sub_ce05c == &e05c
-    assert sub_ce703 == &e703
-    assert sub_ce977 == &e977
-    assert sub_cea65 == &ea65
-    assert sub_cf6a2 == &f6a2
-    assert sub_cf6d5 == &f6d5
-    assert sub_cf7a1 == &f7a1
-    assert sub_cf8b1 == &f8b1
-    assert sub_cf8e1 == &f8e1
-    assert sub_cfba6 == &fba6
-    assert sub_cfbf5 == &fbf5
-    assert sub_cfc15 == &fc15
-    assert sub_cfc62 == &fc62
-    assert sub_cfc79 == &fc79
-    assert sub_cfccf == &fccf
 
 save pydis_start, pydis_end
