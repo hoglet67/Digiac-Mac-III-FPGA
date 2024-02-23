@@ -15,6 +15,8 @@
 // Device: XC6SLX9
 
 
+//`define USE_T65
+
 module digiac
   (
    input         clk50,
@@ -38,7 +40,8 @@ module digiac
    output [10:0] trace,
    output        tm1638_clk,
    output        tm1638_stb,
-   inout         tm1638_dio
+   inout         tm1638_dio,
+   output reg    test
  );
 
    wire        cpu_clk;
@@ -323,6 +326,31 @@ module digiac
    wire        cpu_IRQ = !via_irq_n;
    wire        cpu_NMI = !uart_intr_n;
 
+`ifdef USE_T65
+
+   T65 cpu
+     (
+      .mode    ( 2'b00),
+      .Abort_n ( 1'b1),
+      .SO_n    ( 1'b1),
+      .Res_n   ( !cpu_reset),
+      .Enable  ( cpu_clken),
+      .Clk     ( cpu_clk),
+      .Rdy     ( 1'b1),
+      .IRQ_n   ( !cpu_IRQ),
+      .NMI_n   ( !cpu_NMI),
+      .R_W_n   ( cpu_RnW),
+      .Sync    ( cpu_SYNC),
+      .A       ( cpu_AB),
+      .DI      ( cpu_DI),
+      .DO      ( cpu_DO),
+      .Regs    ( )
+      );
+
+   always @(cpu_RnW)
+       cpu_WE = !cpu_RnW;
+
+`else
    // Arlet's 65C02 Core
    cpu_65c02 cpu
      (
@@ -337,6 +365,15 @@ module digiac
       .RDY(cpu_clken),
       .SYNC(cpu_SYNC)
       );
+
+   always @(posedge cpu_clk) begin
+      if (cpu_clken) begin
+         cpu_AB <= cpu_AB_next;
+         cpu_WE <= cpu_WE_next;
+         cpu_DO <= cpu_DO_next;
+      end
+   end
+`endif
 
    reg         trace_phi2;
    reg         trace_rnw;
@@ -355,11 +392,6 @@ module digiac
       clken_counter <= clken_counter + 1'b1;
       cpu_clken1 <= cpu_clken;
       if (cpu_clken) begin
-         cpu_AB <= cpu_AB_next;
-         cpu_WE <= cpu_WE_next;
-         cpu_DO <= cpu_DO_next;
-      end
-      if (cpu_clken) begin
          trace_phi2 <= 1'b1;
          trace_sync <= cpu_SYNC;
          if (cpu_WE) begin
@@ -375,5 +407,14 @@ module digiac
    end
 
    assign trace = {trace_phi2, trace_sync, trace_rnw, trace_data};
+
+   always @(posedge cpu_clk) begin
+     if (cpu_clken) begin
+        if (cpu_AB == 16'hC956 && cpu_SYNC)
+          test <= 1'b1;
+        else if (cpu_AB == 16'hC96B && cpu_SYNC)
+          test <= 1'b0;
+     end
+   end
 
 endmodule

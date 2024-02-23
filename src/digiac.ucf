@@ -70,3 +70,6 @@ NET "trace<7>"   LOC = "P27"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 
 NET "trace<8>"   LOC = "P30"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "trace<9>"   LOC = "P33"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
 NET "trace<10>"  LOC = "P35"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
+
+# Test output
+NET "test"       LOC = "P44"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 8 ;
