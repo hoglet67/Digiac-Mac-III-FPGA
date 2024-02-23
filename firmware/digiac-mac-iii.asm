@@ -1631,7 +1631,7 @@ user_eprom_entry        = &a002
                      ; wait for next l0233 -> !l0233 edge
                                  ; 19
     ldx #0           ;           ;  2   count transitions over next ~600us
-    ldy #&21 ;       ;           ;  2    was &1E in "take1" ROM
+    ldy #&1E ;       ;           ;  2    was &1E in "take1" ROM
 .loop_cc95a
     lda uart_reg_d_input_ports   ; 4
     and #&40 ; '@'               ; 2
